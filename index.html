@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>リアム、もうすぐ誕生日</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Yusei+Magic&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f2ead6;--ink:#1b1b1b;--red:#d9392b;--yellow:#f4c430;--blue:#2a4fa3}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--paper);color:var(--ink);font-family:"Yusei Magic","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;overflow-x:hidden;
+background-image:repeating-linear-gradient(0deg,transparent 0 31px,rgba(0,0,0,.06) 31px 32px)}
+body.party{background-color:var(--yellow)}
+.screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;text-align:center;position:relative;z-index:2}
+.screen.on{display:flex}
+h1,.big{font-family:"Dela Gothic One","Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;font-weight:400;margin:0}
+.small{font-size:15px;letter-spacing:.08em;margin:0 0 14px}
+.count{display:flex;gap:10px;margin:22px 0 26px;flex-wrap:wrap;justify-content:center}
+.box{border:3px solid var(--ink);background:#fffdf5;padding:10px 12px 6px;min-width:74px;box-shadow:5px 5px 0 var(--ink)}
+.box:nth-child(1){transform:rotate(-2deg)}.box:nth-child(2){transform:rotate(1.5deg)}
+.box:nth-child(3){transform:rotate(-1deg)}.box:nth-child(4){transform:rotate(2.5deg)}
+.box b{display:block;font-family:"Dela Gothic One",sans-serif;font-weight:400;font-size:40px;line-height:1.1}
+.box span{font-size:13px}
+.note{font-size:14px;max-width:300px;line-height:1.6;transform:rotate(-1deg)}
+.title{font-size:clamp(34px,11vw,72px);line-height:1.15;background:var(--red);color:#fff;border:4px solid var(--ink);padding:14px 20px 10px;box-shadow:8px 8px 0 var(--ink);transform:rotate(-2.5deg);display:inline-block}
+.title em{font-style:normal;color:var(--yellow)}
+.sub{font-size:20px;margin:34px 0 8px;transform:rotate(1deg)}
+.name{font-size:clamp(30px,9vw,54px);margin:6px 0 26px;text-shadow:3px 3px 0 #fffdf5}
+.btn{font-family:inherit;font-size:19px;color:var(--ink);background:#fffdf5;border:3px solid var(--ink);padding:12px 22px;box-shadow:5px 5px 0 var(--ink);cursor:pointer;margin:6px}
+.btn:active{transform:translate(4px,4px);box-shadow:1px 1px 0 var(--ink)}
+.btn.red{background:var(--red);color:#fff}
+.hint{font-size:13px;margin-top:18px;opacity:.75}
+#cake{font-size:64px;cursor:pointer;user-select:none;display:inline-block;transform:rotate(-4deg)}
+#cake:active{transform:rotate(6deg) scale(.95)}
+#cv{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+#count3{position:fixed;inset:0;z-index:9;display:none;align-items:center;justify-content:center;background:var(--ink);color:var(--yellow);font-family:"Dela Gothic One",sans-serif;font-size:36vw}
+@keyframes pop{0%{transform:scale(.3) rotate(-10deg);opacity:0}70%{transform:scale(1.08) rotate(-2.5deg)}100%{transform:scale(1) rotate(-2.5deg);opacity:1}}
+.title.pop{animation:pop .7s both}
+body.last{background:var(--ink);background-image:none;color:#fffdf5}
+@keyframes beat{0%{transform:scale(1) rotate(-3deg)}15%{transform:scale(1.12) rotate(2deg)}100%{transform:scale(1) rotate(-3deg)}}
+#last .num{font-family:"Dela Gothic One",sans-serif;font-size:min(46vw,300px);line-height:1;color:var(--red);text-shadow:6px 6px 0 var(--yellow);animation:beat 1s infinite;margin:10px 0}
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="count3"></div>
+
+<!-- 誕生日前 -->
+<section class="screen" id="before">
+  <p class="small">リアムの誕生日まで</p>
+  <h1 class="big" style="font-size:clamp(28px,8vw,44px)">あと…</h1>
+  <div class="count">
+    <div class="box"><b id="d">0</b><span>日</span></div>
+    <div class="box"><b id="h">0</b><span>時間</span></div>
+    <div class="box"><b id="m">0</b><span>分</span></div>
+    <div class="box"><b id="s">0</b><span>秒</span></div>
+  </div>
+  <p class="note">11月8日になった瞬間に、このページが変わります。<br>開いたままでも、あとでもう一度来てもOK。</p>
+</section>
+
+<!-- 残り1分 -->
+<section class="screen" id="last">
+  <p class="small" style="font-size:18px">リアムの誕生日まで、あと</p>
+  <div class="num" id="lastnum">60</div>
+  <h1 class="big" style="font-size:clamp(24px,7vw,40px);color:var(--yellow)">もうすぐ…!</h1>
+</section>
+
+<!-- お祝い -->
+<section class="screen" id="party">
+  <h1 class="title" id="ttl">誕生日<br><em>おめでとう!</em></h1>
+  <p class="sub"></p>
+  <h1 class="name">リアムくん</h1>
+  <div id="cake" title="タップ!">🎂</div>
+  <p class="hint" id="hint">ケーキや画面をタップすると紙吹雪が出るよ</p>
+  <div style="margin-top:18px">
+    <button class="btn red" id="again">もう一度!</button>
+    <button class="btn" id="boom">紙吹雪</button>
+  </div>
+</section>
+
+<script>
+(function(){
+  // 誕生日 2026年11月8日 0:00(見る人の端末の時間)
+  var TARGET = new Date(2026, 10, 8, 0, 00, 00);
+  // 確認用: ?preview=before / ?preview=party
+  var pv = new URLSearchParams(location.search).get('preview');
+  function now(){
+    if(pv==='before') return new Date(2026,10,1);
+    if(pv==='party') return new Date(2026,10,9,12);
+    if(pv==='last') return new Date(Date.now()+OFF);
+    return new Date();
+  }
+  var OFF = pv==='last' ? (TARGET - Date.now() - 62000) : 0;
+  var $ = function(id){return document.getElementById(id)};
+  var current = null, busy = false;
+
+  function show(which){
+    $('before').classList.toggle('on', which==='before');
+    $('last').classList.toggle('on', which==='last');
+    $('party').classList.toggle('on', which==='party');
+    document.body.classList.toggle('party', which==='party');
+    document.body.classList.toggle('last', which==='last');
+    document.title = which==='party' ? 'リアム、誕生日おめでとう!' : 'リアム、もうすぐ誕生日';
+  }
+
+  function tick(){
+    var n = now(), diff = TARGET - n;
+    if(diff > 0){
+      var sec = Math.ceil(diff/1000);
+      if(sec > 60){
+        if(current!=='before'){ current='before'; show('before'); }
+        var t = Math.floor(diff/1000);
+        $('d').textContent = Math.floor(t/86400);
+        $('h').textContent = Math.floor(t%86400/3600);
+        $('m').textContent = Math.floor(t%3600/60);
+        $('s').textContent = t%60;
+      } else {
+        // 残り1分: 特別画面 / 残り5秒: 全画面カウントダウン
+        if(current!=='last'){ current='last'; show('last'); }
+        $('lastnum').textContent = sec;
+        if(sec <= 5 && !busy){
+          var c = $('count3'); c.style.display='flex'; c.textContent = sec;
+        }
+      }
+    } else if(current!=='party'){
+      current='party'; show('party');
+      var isDay = n.getFullYear()===2026 && n.getMonth()===10 && n.getDate()===8;
+      $('hint').textContent = isDay ? '今日はリアムの誕生日!画面をタップしてお祝いしよう'
+                                    : '11月8日はリアムの誕生日でした。「もう一度!」でまたお祝いできるよ';
+      go();
+    }
+  }
+
+  // ---- 紙吹雪 ----
+  var cv=$('cv'), cx=cv.getContext('2d'), P=[], running=false;
+  function fit(){cv.width=innerWidth;cv.height=innerHeight}
+  fit(); addEventListener('resize',fit);
+  var cols=['#d9392b','#f4c430','#2a4fa3','#fffdf5','#1b1b1b','#3a9d5d'];
+  function burst(x,y,n){
+    for(var i=0;i<n;i++){
+      var a=Math.random()*Math.PI*2, v=4+Math.random()*9;
+      P.push({x:x,y:y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-5,w:6+Math.random()*8,h:4+Math.random()*6,
+        r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[i%cols.length]});
+    }
+    if(!running){running=true;requestAnimationFrame(loop)}
+  }
+  function loop(){
+    cx.clearRect(0,0,cv.width,cv.height);
+    P=P.filter(function(p){return p.y<cv.height+30});
+    P.forEach(function(p){
+      p.vy+=.22; p.vx*=.99; p.x+=p.vx; p.y+=p.vy; p.r+=p.vr;
+      cx.save(); cx.translate(p.x,p.y); cx.rotate(p.r);
+      cx.fillStyle=p.c; cx.strokeStyle='#1b1b1b'; cx.lineWidth=1;
+      cx.fillRect(-p.w/2,-p.h/2,p.w,p.h); cx.strokeRect(-p.w/2,-p.h/2,p.w,p.h);
+      cx.restore();
+    });
+    if(P.length) requestAnimationFrame(loop); else {running=false;cx.clearRect(0,0,cv.width,cv.height)}
+  }
+  function rain(){
+    var k=0, id=setInterval(function(){
+      burst(Math.random()*cv.width,-10,18);
+      if(++k>14) clearInterval(id);
+    },180);
+  }
+
+  // ---- 演出(3,2,1 → ドーン) ----
+  function go(){
+    var t=$('ttl');
+    $('count3').style.display='none';
+    t.classList.remove('pop'); t.style.visibility='visible'; void t.offsetWidth; t.classList.add('pop');
+    burst(cv.width/2,cv.height*.35,160); rain(); busy=false;
+  }
+  // 「もう一度」: 残り5秒から始める
+  function replay(){
+    if(busy) return; busy=true;
+    var c=$('count3'), n=5;
+    $('ttl').style.visibility='hidden';
+    c.style.display='flex'; c.textContent=n;
+    var id=setInterval(function(){
+      n--; if(n>0){c.textContent=n}else{clearInterval(id);go()}
+    },1000);
+  }
+
+  $('again').onclick=replay;
+  $('boom').onclick=function(e){ burst(e.clientX||cv.width/2,e.clientY||cv.height/2,120) };
+  $('cake').onclick=function(e){ e.stopPropagation(); burst(e.clientX,e.clientY,100) };
+  $('party').addEventListener('click',function(e){
+    if(e.target.tagName!=='BUTTON') burst(e.clientX,e.clientY,70);
+  });
+
+  tick(); setInterval(tick,250);
+})();
+</script>
+</body>
+</html>
